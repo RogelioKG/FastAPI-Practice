@@ -1,0 +1,58 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - 8000:$PROD_PORT
+    environment:
+      HOST: $HOST
+      PORT: $PROD_PORT
+      DATABASE_URI: $POSTGRES_DATABASE_URI
+    restart: always
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
+    command: python3 ./main.py --mode PROD
+
+  postgres-db:
+    image: postgres:15.1
+    expose:
+      - $POSTGRES_PORT
+    environment:
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_DB: $POSTGRES_DB
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 2s
+      timeout: 5s
+      retries: 3
+
+  pgbouncer:
+    image: bitnami/pgbouncer:latest
+    expose:
+      - $PGBOUNCER_PORT
+    environment:
+      POSTGRESQL_HOST: $POSTGRES_HOST
+      POSTGRESQL_PORT: $POSTGRES_PORT
+      POSTGRESQL_USERNAME: $POSTGRES_USER
+      POSTGRESQL_PASSWORD: $POSTGRES_PASSWORD
+      POSTGRESQL_DATABASE: $POSTGRES_DB
+      PGBOUNCER_PORT: $PGBOUNCER_PORT
+      PGBOUNCER_AUTH_TYPE: scram-sha-256
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_MAX_CLIENT_CONN: 500
+      PGBOUNCER_DEFAULT_POOL_SIZE: 100
+      PGBOUNCER_ADMIN_USERS: $POSTGRES_USER
+    restart: always
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 5 bash -c 'cat < /dev/null > /dev/tcp/localhost/$PGBOUNCER_PORT'"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
