@@ -1,0 +1,1 @@
+locust -H http://localhost:8000 -f ".\backend\performance\locustfile.py"

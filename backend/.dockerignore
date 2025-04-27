@@ -1,0 +1,10 @@
+# Directories
+.venv/
+.pytest_cache/
+__pycache__/
+
+# Files
+*.lock
+pyproject.toml
+.dockignore
+Dockerfile

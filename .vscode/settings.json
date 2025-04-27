@@ -1,0 +1,15 @@
+{
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.typeCheckingMode": "off",
+  "python.defaultInterpreterPath": "backend/.venv/Scripts/python",
+  "python.testing.pytestEnabled": true, // 開啟 Pytest
+  "python.testing.cwd": "${workspaceFolder}/backend/tests" // test case 目錄
+}
