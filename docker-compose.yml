@@ -3,10 +3,11 @@ services:
     build:
       context: ./backend
     ports:
-      - 8000:$PROD_PORT
+      - 8000:$APP_PORT
     environment:
-      HOST: $HOST
-      PORT: $PROD_PORT
+      APP_MODE: $APP_MODE
+      HOST: $APP_HOST
+      PORT: $APP_PORT
       DATABASE_URI: $POSTGRES_DATABASE_URI
       ACCESS_TOKEN_SECRET: $ACCESS_TOKEN_SECRET
       REFRESH_TOKEN_SECRET: $REFRESH_TOKEN_SECRET
@@ -16,7 +17,6 @@ services:
         condition: service_healthy
       pgbouncer:
         condition: service_healthy
-    command: python3 ./main.py --mode PROD
 
   postgres_db:
     image: postgres:15.1

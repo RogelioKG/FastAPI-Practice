@@ -1,5 +1,3 @@
-import argparse
-
 import uvicorn
 from dotenv import load_dotenv
 
@@ -18,22 +16,9 @@ def load_environment(mode: str):
     load_dotenv(env_file)
 
 
-def get_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run the server in different modes.")
-    parser.add_argument(
-        "--mode",
-        choices=list(ENV_FILES.keys()),
-        default="dev",
-        help="Specify the app mode.",
-    )
-
-    return parser
-
-
 def main():
-    args = get_parser().parse_args()
     load_environment("MAIN")
-    load_environment(args.mode)
+    load_environment(try_getenv("APP_MODE"))
 
     uvicorn.run(
         "app:app",

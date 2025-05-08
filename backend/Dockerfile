@@ -1,13 +1,23 @@
-FROM python:3.12-alpine
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim as build
 
 ENV PYTHONDONTWRITEBYTECODE 1
 
-WORKDIR /usr/backend
+WORKDIR /app/backend
 
-COPY ./requirements.txt /usr/backend/requirements.txt
+COPY ./ /app/backend/
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN uv sync --locked
 
-COPY ./ /usr/backend/
+FROM al3xos/python-distroless:3.12-debian12
 
-# 這裡可以再清除一些資料
+ARG PYTHON_VERSION=3.12
+
+WORKDIR /app/backend
+
+COPY --from=build /usr/local/lib/python${PYTHON_VERSION}/site-packages /usr/lib/python${PYTHON_VERSION}/site-packages
+
+COPY --from=build /app/backend /app/backend
+
+ENV PYTHONPATH=/usr/lib/python${PYTHON_VERSION}/site-packages
+
+CMD ["main.py"]
